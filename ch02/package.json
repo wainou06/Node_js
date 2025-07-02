@@ -1,0 +1,19 @@
+{
+  "name": "ch02",
+  "version": "1.0.0",
+  "description": "ch02",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wainou06/Node_js.git"
+  },
+  "author": "minyoung",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wainou06/Node_js/issues"
+  },
+  "homepage": "https://github.com/wainou06/Node_js#readme"
+}
