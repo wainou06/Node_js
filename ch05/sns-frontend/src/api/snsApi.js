@@ -28,3 +28,39 @@ export const registerUser = async (userData) => {
       throw error
    }
 }
+
+// 로그인
+export const loginUser = async (credential) => {
+   try {
+      console.log('credential: ', credential)
+      const response = await snsApi.post('/auth/login', credential)
+
+      console.log('response: ', response)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
+
+// 로그아웃
+export const logoutUser = async () => {
+   try {
+      const response = await snsApi.get('/auth/logout')
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
+
+// 로그인 상태 확인
+export const checkAuthStatus = async () => {
+   try {
+      const response = await snsApi.get('/auth/status')
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
