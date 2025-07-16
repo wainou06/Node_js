@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createPost } from '../api/snsApi'
+import { createPost, getPosts, getPostById, updatePost } from '../api/snsApi'
 
 // 게시물 등록
 export const createPostThunk = createAsyncThunk('posts/createPost', async (postData, { rejectWithValue }) => {
@@ -17,7 +17,13 @@ export const createPostThunk = createAsyncThunk('posts/createPost', async (postD
 // 게시물 수정
 export const updatePostThunk = createAsyncThunk('posts/updatePost', async (data, { rejectWithValue }) => {
    try {
-      console.log(data)
+      console.log('data: ', data)
+      const { id, postData } = data
+
+      const response = await updatePost(id, postData)
+
+      console.log(response)
+      return response.data.post
    } catch (error) {
       return rejectWithValue(error.response?.data?.message)
    }
@@ -35,7 +41,11 @@ export const deletePostThunk = createAsyncThunk('posts/deletePost', async (id, {
 // 특정 게시물 가져오기
 export const fetchPostByIdThunk = createAsyncThunk('posts/fetchPostById', async (id, { rejectWithValue }) => {
    try {
-      console.log(id)
+      console.log('포스트 id: ', id)
+      const response = await getPostById(id)
+
+      console.log(response)
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data?.message)
    }
@@ -44,7 +54,11 @@ export const fetchPostByIdThunk = createAsyncThunk('posts/fetchPostById', async 
 // 전체 게시물 리스트 가져오기
 export const fetchPostsThunk = createAsyncThunk('posts/fetchPosts', async (page, { rejectWithValue }) => {
    try {
-      console.log(page)
+      console.log('page: ', page)
+      const response = await getPosts(page)
+
+      console.log(response)
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data?.message)
    }
@@ -53,7 +67,9 @@ export const fetchPostsThunk = createAsyncThunk('posts/fetchPosts', async (page,
 const postSlice = createSlice({
    name: 'posts',
    initialState: {
-      post: null,
+      post: null, // 게시글 데이터
+      posts: [], // 게시글 리스트
+      pagination: null, // 페이징 객체
       loading: false,
       error: null,
    },
@@ -69,6 +85,46 @@ const postSlice = createSlice({
             state.post = action.payload // 등록한 게시물 데이터
          })
          .addCase(createPostThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+         // 게시물 리스트 불러오기
+         .addCase(fetchPostsThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(fetchPostsThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.posts = action.payload.posts
+            state.pagination = action.payload.pagination
+         })
+         .addCase(fetchPostsThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+         // 특정 게시물 불러오기
+         .addCase(fetchPostByIdThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(fetchPostByIdThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.post = action.payload.post
+         })
+         .addCase(fetchPostByIdThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+         // 게시물 수정
+         .addCase(updatePostThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(updatePostThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.post = action.payload // 수정한 게시물 데이터
+         })
+         .addCase(updatePostThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload
          })

@@ -127,6 +127,60 @@ router.post('/', isLoggedIn, upload.single('img'), async (req, res, next) => {
 // 게시물 수정 localhost:8000/post/:id
 router.put('/:id', isLoggedIn, upload.single('img'), async (req, res, next) => {
    try {
+      // 1. 게시물 존재 여부 확인
+      const post = await Post.findOne({
+         where: { id: req.params.id, user_id: req.user.id },
+      })
+
+      // 게시물이 존재하지 않는다면
+      if (!post) {
+         const error = new Error('게시물을 찾을 수 없습니다.')
+         error.status = 404
+         return next(error)
+      }
+
+      // post 테이블 수정
+      await post.update({
+         content: req.body.content,
+         img: req.file ? `/${req.file.filename}` : post.img, // 수정된 이미지가 있으면 바꿈
+      })
+
+      const hashtags = req.body.hashtags.match(/#[^\s#]*/g) // #을 기준으로 해시태그 추출
+
+      if (hashtags) {
+         const result = await Promise.all(
+            // hashtags 테이블 수정
+            hashtags.map((tag) =>
+               Hashtag.findOrCreate({
+                  where: { title: tag.slice(1) }, //#을 제외한 문자만
+               })
+            )
+         )
+
+         // posthashtag 테이블(교차테이블) 수정
+         await post.setHashtags(result.map((r) => r[0]))
+      }
+
+      // 수정한 게시물 다시 조회(선택사항)
+      const updatedPost = await Post.findOne({
+         where: { id: req.params.id },
+         include: [
+            {
+               model: User,
+               attributes: ['id', 'nick'],
+            },
+            {
+               model: Hashtag,
+               attributes: ['title'],
+            },
+         ],
+      })
+
+      res.status(200).json({
+         success: true,
+         post: updatedPost,
+         message: '게시물이 성공적으로 수정되었습니다.',
+      })
    } catch (error) {
       error.status = 500
       error.message = '게시물 수정 중 오류가 발생했습니다.'
@@ -147,6 +201,32 @@ router.delete('/:id', isLoggedIn, async (req, res, next) => {
 // 특정 게시물 불러오기 localhost:8000/post/:id
 router.get('/:id', async (req, res, next) => {
    try {
+      const post = await Post.findOne({
+         where: { id: req.params.id },
+         include: [
+            {
+               model: User,
+               attributes: ['id', 'nick'],
+            },
+            {
+               model: Hashtag,
+               attributes: ['title'],
+            },
+         ],
+      })
+
+      // 게시물을 가져오지 못했을때
+      if (!post) {
+         const error = new Error('게시물을 찾을 수 없습니다.')
+         error.status = 404
+         return next(error)
+      }
+
+      res.status(200).json({
+         success: true,
+         post,
+         message: '게시물을 성공적으로 불러왔습니다.',
+      })
    } catch (error) {
       error.status = 500
       error.message = '특정 게시물을 불러오는 중 오류가 발생했습니다.'
@@ -157,6 +237,55 @@ router.get('/:id', async (req, res, next) => {
 // 전체 게시물 (페이징 기능) localhost:8000/post?page=1&limit=3
 router.get('/', async (req, res, next) => {
    try {
+      // parseIng('08', 10) -> 10진수 8을 반환
+      const page = parseInt(req.query.page, 10) || 1 // page 번호(기본값 1)
+      const limit = parseInt(req.query.limit, 10) || 3 // 한페이지당 나타낼 게시물 갯수(기본값 3)
+      const offset = (page - 1) * limit // 오프셋 계산
+
+      // 1. 게시물 레코드의 전체 갯수 가져오기
+      /* 
+       page=1, limit=3, offset=0 -> 0개의 레코드를 건너띄고 3개의 최신 레코드를 가져온다
+       select * from posts order by createdAt DESC limit 3 offset 0;
+
+       page=2, limit=3, offset=3 -> 3개의 레코드를 건너띄고 4번째부터 3개의 최신 레코드를 가져온다
+       select * from posts order by createdAt DESC limit 3 offset 3;
+
+       page=3, limit=3, offset=6 -> 6개의 레코드를 건너띄고 7번째부터 3개의 최신 레코드를 가져온다
+       */
+
+      const count = await Post.count()
+
+      // 2. 게시물 레코드 가져오기
+      const posts = await Post.findAll({
+         limit,
+         offset,
+         order: [['createdAt', 'DESC']], // 게시물을 최근 날짜 순으로 가져온다
+         // 게시글 작성한 사람과 게시글에 작성된 해시태그를 같이 가져온다
+         include: [
+            {
+               model: User,
+               attributes: ['id', 'nick', 'email'],
+            },
+            {
+               model: Hashtag,
+               attributes: ['title'],
+            },
+         ],
+      })
+
+      console.log('posts: ', posts)
+
+      res.status(200).json({
+         success: true,
+         posts,
+         pagination: {
+            totalPosts: count, // 전체 게시물 수
+            currentPage: page, // 현재 페이지
+            totalPages: Math.ceil(count / limit), // 총 페이지 수
+            limit, // 페이지당 게시물 수
+         },
+         message: '전체 게시물 리스트를 성공적으로 불러왔습니다.',
+      })
    } catch (error) {
       error.status = 500
       error.message = '게시물 리스트를 불러오는 중 오류가 발생했습니다.'

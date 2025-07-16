@@ -85,3 +85,46 @@ export const createPost = async (postData) => {
       throw error
    }
 }
+
+// 전체 포스트 가져오기(페이징)
+export const getPosts = async (page) => {
+   try {
+      // page: 페이지 번호
+      const response = await snsApi.get(`/post?page=${page}`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
+
+// 특정 포스트 가져오기
+export const getPostById = async (id) => {
+   try {
+      const response = await snsApi.get(`/post/${id}`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
+
+// 포스트 수정
+export const updatePost = async (id, postData) => {
+   try {
+      // id: post의 id, postData: 수정할 게시물 데이터가 담겨져있는 객체
+
+      // ★서버에 파일 전송시 반드시 해야하는 headers 설정
+      const config = {
+         headers: {
+            'Content-Type': 'multipart/form-data', // 파일 전송시 반드시 지정
+         },
+      }
+
+      const response = await snsApi.put(`/post/${id}`, postData, config)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
