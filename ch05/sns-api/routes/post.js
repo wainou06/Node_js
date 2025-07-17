@@ -191,6 +191,24 @@ router.put('/:id', isLoggedIn, upload.single('img'), async (req, res, next) => {
 // 게시물 삭제 localhost:8000/post/:id
 router.delete('/:id', isLoggedIn, async (req, res, next) => {
    try {
+      // 1. 삭제할 게시물 존재 여부 확인
+      const post = await Post.findOne({
+         where: { id: req.params.id, user_id: req.user.id },
+      })
+
+      if (!post) {
+         const error = new Error('게시물을 찾을 수 없습니다.')
+         error.status = 404
+         return next(error)
+      }
+
+      // 게시물 삭제
+      await post.destroy()
+
+      res.status(200).json({
+         success: true,
+         message: '게시물이 성공적으로 삭제되었습니다.',
+      })
    } catch (error) {
       error.status = 500
       error.message = '게시물 삭제 중 오류가 발생했습니다.'

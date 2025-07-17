@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createPost, getPosts, getPostById, updatePost } from '../api/snsApi'
+import { createPost, getPosts, getPostById, updatePost, deletePost } from '../api/snsApi'
 
 // 게시물 등록
 export const createPostThunk = createAsyncThunk('posts/createPost', async (postData, { rejectWithValue }) => {
@@ -32,7 +32,11 @@ export const updatePostThunk = createAsyncThunk('posts/updatePost', async (data,
 // 게시물 삭제
 export const deletePostThunk = createAsyncThunk('posts/deletePost', async (id, { rejectWithValue }) => {
    try {
-      console.log(id)
+      console.log('포스트 id: ', id)
+      const response = await deletePost(id)
+
+      console.log(response)
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data?.message)
    }
@@ -125,6 +129,18 @@ const postSlice = createSlice({
             state.post = action.payload // 수정한 게시물 데이터
          })
          .addCase(updatePostThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+         // 게시물 삭제
+         .addCase(deletePostThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(deletePostThunk.fulfilled, (state) => {
+            state.loading = false
+         })
+         .addCase(deletePostThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload
          })
