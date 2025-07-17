@@ -6,7 +6,7 @@ import dayjs from 'dayjs' //날짜 시간 포맷해주는 패키지
 
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { deletePostThunk, fetchPostsThunk } from '../../features/postSlice'
+import { deletePostThunk } from '../../features/postSlice'
 
 function PostItem({ post, isAuthenticated, user }) {
    const dispatch = useDispatch()
@@ -20,7 +20,6 @@ function PostItem({ post, isAuthenticated, user }) {
             .unwrap()
             .then(() => {
                // 그냥 navigate만 이동시 삭제된 목록이 여전히 보이기 때문에 삭제 후 바로 리스트 새로 불러오기
-               dispatch(fetchPostsThunk())
                navigate('/')
             })
             .catch((error) => {
