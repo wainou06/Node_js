@@ -20,9 +20,7 @@ function Navbar({ isAuthenticated, user }) {
          .then(() => {
             navigator('/') //로그아웃 완료 후 메인페이지로 이동
          })
-         .catch((error) => {
-            alert('로그아웃 실패:', error)
-         })
+         .catch((error) => alert('로그아웃 실패: ', error))
    }
    return (
       <AppBar
