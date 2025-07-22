@@ -8,11 +8,14 @@ import Footer from './components/shared/Footer'
 import Home from './pages/Home'
 import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
+import ItemCreatePage from './pages/ItemCreatePage'
+import ItemListPage from './pages/ItemListPage'
 import { useEffect } from 'react'
 import { checkAuthStatusThunk } from './features/authSlice'
 
 function App() {
    const dispatch = useDispatch()
+   const location = useLocation()
    const { isAuthenticated, user } = useSelector((state) => state.auth)
 
    useEffect(() => {
@@ -26,6 +29,13 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
+
+            {/* 상품리스트 */}
+            {/* navigate로 상품리스트 페이지 이동시 key값 덕분에 언마운트 후 마운트 된다 */}
+            <Route path="/items/createlist" element={<ItemListPage key={location.key} />} />
+
+            {/* 상품 등록 */}
+            <Route path="/items/create" element={<ItemCreatePage />} />
          </Routes>
          <Footer />
       </>

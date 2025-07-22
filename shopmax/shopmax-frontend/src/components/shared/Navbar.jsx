@@ -96,7 +96,9 @@ function Navbar({ isAuthenticated, user }) {
                      sx={{ display: { xs: 'block', md: 'none' } }}
                   >
                      <MenuItem>
-                        <Typography sx={{ textAlign: 'center' }}>상품등록</Typography>
+                        <Link to="/items/createlist">
+                           <Typography sx={{ textAlign: 'center' }}>상품등록</Typography>
+                        </Link>
                      </MenuItem>
                      <MenuItem>
                         <Typography sx={{ textAlign: 'center' }}>상품구매</Typography>
@@ -129,7 +131,9 @@ function Navbar({ isAuthenticated, user }) {
                </Typography>
                <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                   <MenuItem>
-                     <Typography sx={{ textAlign: 'center' }}>상품등록</Typography>
+                     <Link to="/items/createlist">
+                        <Typography sx={{ textAlign: 'center' }}>상품등록</Typography>
+                     </Link>
                   </MenuItem>
                   <MenuItem>
                      <Typography sx={{ textAlign: 'center' }}>상품구매</Typography>
