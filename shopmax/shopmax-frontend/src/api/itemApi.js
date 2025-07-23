@@ -32,3 +32,42 @@ export const getItems = async (data) => {
       throw error
    }
 }
+
+// 상품 삭제
+export const deleteItem = async (id) => {
+   try {
+      const response = await shopmaxApi.delete(`/item/${id}`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}
+
+// 특정 상품 불러오기
+export const getItemById = async (id) => {
+   try {
+      const response = await shopmaxApi.get(`/item/${id}`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}
+
+// 상품 수정
+export const updateItem = async (id, itemData) => {
+   try {
+      const config = {
+         headers: {
+            'Content-Type': 'multipart/form-data', // 파일 전송시 반드시 지정
+         },
+      }
+
+      const response = await shopmaxApi.put(`/item/${id}`, itemData, config)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}

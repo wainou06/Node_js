@@ -10,6 +10,7 @@ import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
 import ItemCreatePage from './pages/ItemCreatePage'
 import ItemListPage from './pages/ItemListPage'
+import ItemEditPage from './pages/ItemEditPage'
 import { useEffect } from 'react'
 import { checkAuthStatusThunk } from './features/authSlice'
 
@@ -36,6 +37,9 @@ function App() {
 
             {/* 상품 등록 */}
             <Route path="/items/create" element={<ItemCreatePage />} />
+
+            {/* 상품 수정 */}
+            <Route path="/items/edit/:id" element={<ItemEditPage />} />
          </Routes>
          <Footer />
       </>

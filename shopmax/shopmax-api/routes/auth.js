@@ -2,10 +2,11 @@ const express = require('express')
 const bcrypt = require('bcrypt')
 const passport = require('passport')
 const User = require('../models/user')
+const { isLoggedIn, isNotLoggedIn } = require('./middlewares')
 const router = express.Router()
 
 // 회원가입
-router.post('/join', async (req, res, next) => {
+router.post('/join', isNotLoggedIn, async (req, res, next) => {
    try {
       const { email, name, address, password } = req.body
 
@@ -52,7 +53,7 @@ router.post('/join', async (req, res, next) => {
 })
 
 // 로그인
-router.post('/login', async (req, res, next) => {
+router.post('/login', isNotLoggedIn, async (req, res, next) => {
    passport.authenticate('local', (authError, user, info) => {
       if (authError) {
          // 로그인 인증 중 에러 발생시
@@ -94,7 +95,7 @@ router.post('/login', async (req, res, next) => {
 })
 
 // 로그아웃
-router.get('/logout', async (req, res, next) => {
+router.get('/logout', isLoggedIn, async (req, res, next) => {
    req.logout((logoutError) => {
       if (logoutError) {
          // 로그아웃 상태로 바꾸는 중 에러 발생시
