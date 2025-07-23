@@ -11,6 +11,8 @@ import LoginPage from './pages/LoginPage'
 import ItemCreatePage from './pages/ItemCreatePage'
 import ItemListPage from './pages/ItemListPage'
 import ItemEditPage from './pages/ItemEditPage'
+import ItemSellDetailPage from './pages/ItemSellDetailPage'
+
 import { useEffect } from 'react'
 import { checkAuthStatusThunk } from './features/authSlice'
 
@@ -31,7 +33,7 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
 
-            {/* 상품리스트 */}
+            {/* 상품 리스트 */}
             {/* navigate로 상품리스트 페이지 이동시 key값 덕분에 언마운트 후 마운트 된다 */}
             <Route path="/items/createlist" element={<ItemListPage key={location.key} />} />
 
@@ -40,6 +42,9 @@ function App() {
 
             {/* 상품 수정 */}
             <Route path="/items/edit/:id" element={<ItemEditPage />} />
+
+            {/* 상품 상세페이지 */}
+            <Route path="/items/detail/:id" element={<ItemSellDetailPage />} />
          </Routes>
          <Footer />
       </>
