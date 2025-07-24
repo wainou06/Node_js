@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid'
 import LocalMallIcon from '@mui/icons-material/LocalMall'
 import NumberInput from '../../styles/NumberInput'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { fetchItemByIdThunk } from '../../features/itemSlice'
@@ -13,7 +13,20 @@ function ItemSellDetail() {
    const { id } = useParams()
    const disPatch = useDispatch()
    const { item, error, loading } = useSelector((state) => state.items)
+   const [count, setCount] = useState(1) // 수량
+   const [orderPrice, setOrderPrice] = useState(0) // 총 상품가격
+   const [orderComplete, setOrderComplete] = useState(false) // 주문완료 상태
 
+   // 수량 증가시 총 가격 계산
+   // 처음 상세페이지 들어왔을때도 상품가격을 보여주기 위해 useEffect 사용
+   useEffect(() => {
+      if (item) {
+         // 상품이 있다면 상품가격 * 수량
+         setOrderPrice(item.price * count)
+      }
+   }, [item, count]) // 수량이 바뀔때마다 총 가격 변경
+
+   // 상품 데이터 불러오기
    useEffect(() => {
       disPatch(fetchItemByIdThunk(id))
    }, [disPatch, id])
@@ -52,8 +65,8 @@ function ItemSellDetail() {
                            <Alert severity="error">품절</Alert>
                         ) : (
                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '300px' }}>
-                              <NumberInput />
-                              <Typography variant="h6"> 총 가격:</Typography>
+                              <NumberInput value={count} onChange={(e) => setCount(Number(e.target.value))} min={1} max={item.stockNumber} step={1} />
+                              <Typography variant="h6"> 총 가격: {formatWithComma(String(orderPrice))}원</Typography>
                               <Button variant="contained" color="primary">
                                  구매하기
                               </Button>
@@ -64,6 +77,21 @@ function ItemSellDetail() {
                </Grid>
 
                {/* 상세 이미지, 상세 설명 */}
+               <Box sx={{ marginTop: '180px' }}>
+                  <Typography variant="h5" gutterBottom>
+                     상세 정보
+                  </Typography>
+                  <Typography variant="body1" gutterBottom sx={{ mt: 4, mb: 5 }}>
+                     {item.itemDetail}
+                  </Typography>
+                  <Grid container spacing={2}>
+                     {item.Imgs.map((img, index) => (
+                        <Grid key={index} xs={12} sm={6} md={4}>
+                           <CardMedia component="img" image={`${import.meta.env.VITE_APP_API_URL}${img.imgUrl}`} alt={`상세 이미지 ${index + 1}`} sx={{ width: '100%', borderRadius: '8px' }} />
+                        </Grid>
+                     ))}
+                  </Grid>
+               </Box>
             </Box>
          )}
       </>
