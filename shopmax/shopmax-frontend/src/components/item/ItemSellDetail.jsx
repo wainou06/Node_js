@@ -3,15 +3,16 @@ import Grid from '@mui/material/Grid'
 import LocalMallIcon from '@mui/icons-material/LocalMall'
 import NumberInput from '../../styles/NumberInput'
 
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { fetchItemByIdThunk } from '../../features/itemSlice'
 import { formatWithComma } from '../../utils/priceSet'
+import { useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchItemByIdThunk } from '../../features/itemSlice'
+import { createOrderThunk } from '../../features/orderSlice'
+import { useState, useEffect } from 'react'
 
 function ItemSellDetail() {
-   const { id } = useParams()
-   const disPatch = useDispatch()
+   const { id } = useParams() // item의 id
+   const dispatch = useDispatch()
    const { item, error, loading } = useSelector((state) => state.items)
    const [count, setCount] = useState(1) // 수량
    const [orderPrice, setOrderPrice] = useState(0) // 총 상품가격
@@ -26,10 +27,45 @@ function ItemSellDetail() {
       }
    }, [item, count]) // 수량이 바뀔때마다 총 가격 변경
 
-   // 상품 데이터 불러오기
+   // 상품 주문
+   const handleBuy = () => {
+      dispatch(
+         createOrderThunk({
+            items: [
+               {
+                  itemId: id, // 상품 id
+                  count, // 상품수량
+               },
+            ],
+         })
+      )
+         .unwrap()
+         .then(() => {
+            alert('주문이 완료되었습니다.')
+            setOrderComplete((prev) => !prev) //state를 바꿔서 컴포넌트 재렌더링시 바뀐 재고가 보이도록 함
+         })
+         .catch((error) => {
+            console.error('주문 에러:', error)
+            alert('주문에 실패했습니다. ' + error)
+         })
+   }
+
+   //상품 데이터 불러오기
    useEffect(() => {
-      disPatch(fetchItemByIdThunk(id))
-   }, [disPatch, id])
+      dispatch(fetchItemByIdThunk(id))
+   }, [dispatch, id, orderComplete])
+
+    if (loading) {
+       return null // 아무것도 보여주지 않음
+    }
+
+    if (error) {
+       return (
+          <Typography variant="body1" align="center" color="error">
+             에러 발생: {error}
+          </Typography>
+       )
+    }
 
    return (
       <>
@@ -55,7 +91,7 @@ function ItemSellDetail() {
                         </Typography>
 
                         <Typography variant="h6" gutterBottom>
-                           가격: {formatWithComma(String(item.price))}
+                           가격: {formatWithComma(String(item.price))}원
                         </Typography>
                         <Typography variant="body2" color="text.secondary" gutterBottom>
                            재고: {item.stockNumber}개
@@ -66,8 +102,8 @@ function ItemSellDetail() {
                         ) : (
                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '300px' }}>
                               <NumberInput value={count} onChange={(e) => setCount(Number(e.target.value))} min={1} max={item.stockNumber} step={1} />
-                              <Typography variant="h6"> 총 가격: {formatWithComma(String(orderPrice))}원</Typography>
-                              <Button variant="contained" color="primary">
+                              <Typography variant="h6">총 가격: {formatWithComma(String(orderPrice))}원</Typography>
+                              <Button variant="contained" color="primary" onClick={handleBuy}>
                                  구매하기
                               </Button>
                            </Box>

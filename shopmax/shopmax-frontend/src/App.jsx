@@ -12,6 +12,7 @@ import ItemCreatePage from './pages/ItemCreatePage'
 import ItemListPage from './pages/ItemListPage'
 import ItemEditPage from './pages/ItemEditPage'
 import ItemSellDetailPage from './pages/ItemSellDetailPage'
+import MyOrderListPage from './pages/MyOrderListPage'
 
 import { useEffect } from 'react'
 import { checkAuthStatusThunk } from './features/authSlice'
@@ -45,6 +46,9 @@ function App() {
 
             {/* 상품 상세페이지 */}
             <Route path="/items/detail/:id" element={<ItemSellDetailPage />} />
+
+            {/* 주문내역 페이지 */}
+            <Route path="/myorderlist" element={<MyOrderListPage />} />
          </Routes>
          <Footer />
       </>
