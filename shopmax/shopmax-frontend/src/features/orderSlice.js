@@ -1,9 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createOrder, getOrders, cancelOrder, deleteOrder } from '../api/orderApi'
+import { createOrder, getOrders, cancelOrder, deleteOrder, getChartOrders } from '../api/orderApi'
 
 // 주문하기
 export const createOrderThunk = createAsyncThunk('order/createOrder', async (orderData, { rejectWithValue }) => {
    try {
+      // orderData: 주문 상품 목록 데이터
+      // orderData = { items: [{itemId: 1, count: 2 }, {itemId: 2, count: 1 }] }
       const response = await createOrder(orderData)
       return response.data.orderId
    } catch (error) {
@@ -11,7 +13,7 @@ export const createOrderThunk = createAsyncThunk('order/createOrder', async (ord
    }
 })
 
-// 주문 목록
+// 주문목록 가져오기
 export const getOrdersThunk = createAsyncThunk('order/getOrders', async (data, { rejectWithValue }) => {
    try {
       const response = await getOrders(data)
@@ -41,6 +43,16 @@ export const deleteOrderThunk = createAsyncThunk('order/deleteOrder', async (id,
    }
 })
 
+// 차트용 주문목록 가져오기
+export const getChartOrdersThunk = createAsyncThunk('order/getChartOrders', async (_, { rejectWithValue }) => {
+   try {
+      const response = await getChartOrders()
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message)
+   }
+})
+
 const orderSlice = createSlice({
    name: 'order',
    initialState: {
@@ -51,8 +63,8 @@ const orderSlice = createSlice({
    },
    reducers: {},
    extraReducers: (builder) => {
-      // 주문하기
       builder
+         //주문하기
          .addCase(createOrderThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -64,7 +76,7 @@ const orderSlice = createSlice({
             state.loading = false
             state.error = action.payload
          })
-         // 주문 목록
+         //주문목록
          .addCase(getOrdersThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -78,7 +90,7 @@ const orderSlice = createSlice({
             state.loading = false
             state.error = action.payload
          })
-         // 주문 취소
+         //주문취소
          .addCase(cancelOrderThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -90,7 +102,7 @@ const orderSlice = createSlice({
             state.loading = false
             state.error = action.payload
          })
-         // 주문 삭제
+         //주문삭제
          .addCase(deleteOrderThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -99,6 +111,19 @@ const orderSlice = createSlice({
             state.loading = false
          })
          .addCase(deleteOrderThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+         //차트용 주문목록
+         .addCase(getChartOrdersThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(getChartOrdersThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.orders = action.payload.orders
+         })
+         .addCase(getChartOrdersThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload
          })

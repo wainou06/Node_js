@@ -47,3 +47,14 @@ export const deleteOrder = async (id) => {
       throw error
    }
 }
+
+// 주문 목록 - 차트용
+export const getChartOrders = async () => {
+   try {
+      const response = await shopmaxApi.get(`/order/chartlist`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error}`)
+      throw error
+   }
+}

@@ -10,7 +10,7 @@ import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
-import { Link as MUILink } from '@mui/material'
+// import { Link as MUILink } from '@mui/material'
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket'
 // https://mui.com/material-ui/react-app-bar/#app-bar-with-responsive-menu
 
@@ -29,7 +29,7 @@ function Navbar({ isAuthenticated, user }) {
       dispatch(logoutUserThunk())
          .unwrap()
          .then(() => {
-            navigate('/')
+            navigate('/') // 로그아웃시 홈으로 이동
          })
          .catch((error) => {
             alert('로그아웃 실패: ' + error)
@@ -74,7 +74,6 @@ function Navbar({ isAuthenticated, user }) {
                >
                   SHOPMAX
                </Typography>
-
                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                   <IconButton size="large" aria-label="account of current user" aria-controls="menu-appbar" aria-haspopup="true" onClick={handleOpenNavMenu} color="inherit">
                      <MenuIcon />
@@ -95,10 +94,18 @@ function Navbar({ isAuthenticated, user }) {
                      onClose={handleCloseNavMenu}
                      sx={{ display: { xs: 'block', md: 'none' } }}
                   >
+                     {/* 관리자만 볼 수 있도록 */}
                      {user && user.role === 'ADMIN' && (
                         <MenuItem>
-                           <Link to="/items/createlist">
+                           <Link to="/items/createlist" style={{ color: 'black', textDecoration: 'none' }}>
                               <Typography sx={{ textAlign: 'center' }}>상품등록</Typography>
+                           </Link>
+                        </MenuItem>
+                     )}
+                     {user && user.role === 'ADMIN' && (
+                        <MenuItem>
+                           <Link to="/chart" style={{ color: 'black', textDecoration: 'none' }}>
+                              <Typography sx={{ textAlign: 'center' }}>통계</Typography>
                            </Link>
                         </MenuItem>
                      )}
@@ -112,7 +119,7 @@ function Navbar({ isAuthenticated, user }) {
                   </Menu>
                </Box>
 
-               {/* PC버전 메뉴 */}
+               {/* PC 메뉴 */}
                <ShoppingBasketIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
                <Typography
                   variant="h5"
@@ -133,13 +140,22 @@ function Navbar({ isAuthenticated, user }) {
                   SHOPMAX
                </Typography>
                <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                  {/* 관리자만 볼 수 있도록 */}
                   {user && user.role === 'ADMIN' && (
                      <MenuItem>
-                        <Link to="/items/createlist">
+                        <Link to="/items/createlist" style={{ color: 'black', textDecoration: 'none' }}>
                            <Typography sx={{ textAlign: 'center' }}>상품등록</Typography>
                         </Link>
                      </MenuItem>
                   )}
+                  {user && user.role === 'ADMIN' && (
+                     <MenuItem>
+                        <Link to="/chart" style={{ color: 'black', textDecoration: 'none' }}>
+                           <Typography sx={{ textAlign: 'center' }}>통계</Typography>
+                        </Link>
+                     </MenuItem>
+                  )}
+
                   <MenuItem>
                      <Typography sx={{ textAlign: 'center' }}>상품구매</Typography>
                   </MenuItem>
@@ -211,4 +227,5 @@ function Navbar({ isAuthenticated, user }) {
       </AppBar>
    )
 }
+
 export default Navbar
