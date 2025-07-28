@@ -22,7 +22,7 @@ function ItemEditPage() {
 
             navigate('/items/createlist')
          })
-   }, [dispatch, id])
+   }, [dispatch, id, navigate])
 
    // 상품 수정
    const onEditSubmit = (itemData) => {

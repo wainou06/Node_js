@@ -13,6 +13,8 @@ import ItemListPage from './pages/ItemListPage'
 import ItemEditPage from './pages/ItemEditPage'
 import ItemSellDetailPage from './pages/ItemSellDetailPage'
 import MyOrderListPage from './pages/MyOrderListPage'
+import TokenPage from './pages/TokenPage'
+import ChatPage from './pages/ChatPage'
 
 import { useEffect } from 'react'
 import { checkAuthStatusThunk } from './features/authSlice'
@@ -49,6 +51,12 @@ function App() {
 
             {/* 주문내역 페이지 */}
             <Route path="/myorderlist" element={<MyOrderListPage />} />
+
+            {/* 토큰 발급 페이지 */}
+            <Route path="/token" element={<TokenPage />} />
+
+            {/* 채팅 페이지 */}
+            <Route path="/chat" element={<ChatPage />} />
          </Routes>
          <Footer />
       </>
