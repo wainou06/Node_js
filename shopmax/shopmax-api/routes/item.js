@@ -37,7 +37,47 @@ const upload = multer({
    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB로 제한
 })
 
-// 상품등록 localhost:8000/item/
+/**
+ * @swagger
+ * /item:
+ *   post:
+ *     summary: 상품 등록
+ *     tags: [Item]
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *                itemNm:
+ *                   type: string
+ *                   description: 상품명
+ *                price:
+ *                   type: number
+ *                   description: 가격
+ *                itemDetail:
+ *                   type: string
+ *                   description: 상품 상세
+ *                itemSellStatus:
+ *                   type: string
+ *                   description: 판매상태(SELL, SOLD_OUT)
+ *                img:
+ *                   type: array
+ *                   items:
+ *                      type: string
+ *                      format: binary
+ *                   description: 업로드 이미지 파일 목록(최대 5개)
+ *     responses:
+ *          201:
+ *             description: 상품 등록 성공
+ *          400:
+ *             description: 파일 업로드 실패
+ *          500:
+ *             description: 서버 오류
+ */
 router.post('/', verifyToken, isAdmin, upload.array('img'), async (req, res, next) => {
    try {
       // 업로드된 파일 확인
@@ -237,7 +277,56 @@ router.get('/:id', verifyToken, async (req, res, next) => {
    }
 })
 
-// 상품 수정
+/**
+ * @swagger
+ * /item/{id}:
+ *   put:
+ *     summary: 상품 수정
+ *     tags: [Item]
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 상품 id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               itemNm:
+ *                 type: string
+ *                 description: 상품명
+ *               price:
+ *                 type: number
+ *                 description: 가격
+ *               stockNumber:
+ *                 type: integer
+ *                 description: 상품 상세
+ *               itemDetail:
+ *                 type: string
+ *                 description: 판매상태(SELL, SOLD_OUT)
+ *               itemSellStatus:
+ *                 type: string
+ *               img:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: 업로드 이미지 파일 목록(최대 5개)
+ *     responses:
+ *       201:
+ *         description: 상품 등록 성공
+ *       400:
+ *         description: 파일 업로드 실패
+ *       500:
+ *         description: 서버 오류
+ */
 router.put('/:id', verifyToken, isAdmin, upload.array('img'), async (req, res, next) => {
    try {
       const id = req.params.id

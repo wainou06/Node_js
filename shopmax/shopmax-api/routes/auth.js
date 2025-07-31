@@ -5,7 +5,41 @@ const User = require('../models/user')
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares')
 const router = express.Router()
 
-// 회원가입
+/**
+ * @swagger
+ * /auth/join:
+ *   post:
+ *     summary: 사용자 회원가입
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - name
+ *               - address
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: 회원가입 성공
+ *       409:
+ *         description: 이미 존재하는 사용자
+ *       500:
+ *         description: 서버 오류
+ */
+
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
    try {
       const { email, name, address, password } = req.body
@@ -113,7 +147,18 @@ router.get('/logout', isLoggedIn, async (req, res, next) => {
    })
 })
 
-// 로그인 상태확인
+/**
+ * @swagger
+ * /auth/status:
+ *   get:
+ *     summary: 로그인 상태확인
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *          description: 로그인 여부 및 사용자 정보
+ *       500:
+ *          description: 서버 오류
+ */
 router.get('/status', async (req, res, next) => {
    try {
       if (req.isAuthenticated()) {

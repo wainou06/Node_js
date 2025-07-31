@@ -112,8 +112,41 @@ router.post('/', verifyToken, isLoggedIn, async (req, res, next) => {
    }
 })
 
-// 주문 목록(페이징, 날짜 검색)
-// localhost:8000/order/list?page=1&limit=5&startDate=2025-01-01&endDate=2025-01-16
+/**
+ * @swagger
+ * /order/list:
+ *   get:
+ *     summary: 주문 목록 조회(페이징 및 날짜 검색)
+ *     tags: [Order]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: 페이지 번호
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: 페이지당 항목 수
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: 시작 날짜
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: 종료 날짜
+ *     responses:
+ *         200:
+ *          description: 주문 목록 조회 성공
+ *         500:
+ *          description: 서버 오류
+ */
 router.get('/list', verifyToken, isLoggedIn, async (req, res, next) => {
    try {
       const page = parseInt(req.query.page, 10) || 1
@@ -183,7 +216,29 @@ router.get('/list', verifyToken, isLoggedIn, async (req, res, next) => {
    }
 })
 
-// 주문 취소
+/**
+ * @swagger
+ * /order/cancel/{id}:
+ *   post:
+ *     summary: 주문 취소
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 주문 id
+ *     responses:
+ *       200:
+ *         description: 주문 취소 성공
+ *       404:
+ *         description: 주문 없음
+ *       400:
+ *         description: 이미 취소된 주문
+ *       500:
+ *         description: 서버 오류
+ */
 router.post('/cancel/:id', verifyToken, isLoggedIn, async (req, res, next) => {
    try {
       const transaction = await sequelize.transaction()
